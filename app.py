@@ -11,7 +11,8 @@ import gdown  # For downloading files from Google Drive
 
 # Google Drive file links (convert to direct download links)
 pickle_file_url = "https://drive.google.com/uc?id=1i2IfrKdXUAs6zi-O62UlugYiXl2pjSDq"
-dataset_zip_url = "https://drive.google.com/uc?id=18DXUMcu4rh9SsF5YQRFhwPcrYuHcBWk8"
+dataset_zip_url = "https://drive.google.com/uc?id=1y_Y_1_tq-x2hmOJ4q8YZJsmi8RdayWCI"
+
 
 # Paths to save the files locally
 pickle_file_path = "features_and_model.pkl"
