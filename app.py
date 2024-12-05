@@ -3,18 +3,18 @@ import numpy as np
 import cv2
 import streamlit as st
 from tensorflow.keras.models import load_model
-from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
 from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.resnet50 import preprocess_input
+import gdown
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import euclidean_distances
-import gdown
 
 # Function to download the .h5 file from Google Drive
 def download_h5_file():
-    h5_url = "https://drive.google.com/uc?id=11AKeq1oKx72JO4ovGT-VI-WAOkn1qqzg"  # Your Google Drive link
+    h5_url = "https://drive.google.com/uc?id=1MI9frsLSXKlYeQSp-zbLuxaSfawLzwZJ"  # Your Google Drive link
     output = "model.h5"
     if not os.path.exists(output):  # Only download if not already downloaded
-        print(f"Downloading model from Google Drive...")
+        print("Downloading model from Google Drive...")
         gdown.download(h5_url, output, quiet=False)
     else:
         print("Model file already downloaded.")
@@ -27,13 +27,13 @@ def extract_features(img_path, model):
             print(f"Error loading image {img_path}")
             return None
         
-        img = cv2.resize(img, (224, 224))
+        img = cv2.resize(img, (224, 224))  # Resize to ResNet50 input size
         img = image.img_to_array(img)
         img = np.expand_dims(img, axis=0)
         img = preprocess_input(img)
         
         features = model.predict(img)
-        return features.flatten()
+        return features.flatten()  # Flatten the features for easier comparison
     except Exception as e:
         print(f"Error extracting features from {img_path}: {e}")
         return None
