@@ -2,22 +2,22 @@ import os
 import numpy as np
 import cv2
 import streamlit as st
+from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
 from tensorflow.keras.preprocessing import image
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import euclidean_distances
-import pickle
 import gdown
 
-# Function to download pickle file from Google Drive
-def download_pickle_file():
-    pickle_url = "https://drive.google.com/uc?id=1i2IfrKdXUAs6zi-O62UlugYiXl2pjSDq"  # Your Google Drive link
-    output = "features_and_model.pkl"
+# Function to download the .h5 file from Google Drive
+def download_h5_file():
+    h5_url = "https://drive.google.com/uc?id=11AKeq1oKx72JO4ovGT-VI-WAOkn1qqzg"  # Your Google Drive link
+    output = "model.h5"
     if not os.path.exists(output):  # Only download if not already downloaded
-        print(f"Downloading pickle file from Google Drive...")
-        gdown.download(pickle_url, output, quiet=False)
+        print(f"Downloading model from Google Drive...")
+        gdown.download(h5_url, output, quiet=False)
     else:
-        print("Pickle file already downloaded.")
+        print("Model file already downloaded.")
 
 # Function to extract features using ResNet50
 def extract_features(img_path, model):
@@ -38,23 +38,18 @@ def extract_features(img_path, model):
         print(f"Error extracting features from {img_path}: {e}")
         return None
 
-# Load the model and features from pickle file
-def load_from_pickle():
-    download_pickle_file()  # Ensure the pickle file is downloaded
+# Function to load the model from the .h5 file
+def load_model_from_h5():
+    download_h5_file()  # Ensure the model file is downloaded
     
-    pickle_path = "features_and_model.pkl"
-    if os.path.exists(pickle_path):
-        print(f"Loading model and features from {pickle_path}")
-        with open(pickle_path, "rb") as f:
-            data = pickle.load(f)
-        model = data["model"]
-        image_paths = data["image_paths"]
-        feature_list = data["feature_list"]
-        print(f"Model loaded: {model}, Image paths: {len(image_paths)} items, Feature list: {len(feature_list)} items")
-        return model, image_paths, feature_list
+    h5_path = "model.h5"
+    if os.path.exists(h5_path):
+        print(f"Loading model from {h5_path}")
+        model = load_model(h5_path)  # Load the model from the .h5 file
+        return model
     else:
-        print(f"Pickle file {pickle_path} not found.")
-        return None, None, None
+        print(f"Model file {h5_path} not found.")
+        return None
 
 # Function to calculate the Euclidean distance between the feature of the test image and all images
 def find_similar_images(image_paths, feature_list, test_img_path, model, num_similar_images=4):
@@ -85,18 +80,22 @@ st.markdown("<h5 style='text-align: left;'>Created by Abdul Qayyum</h5>", unsafe
 # File uploader for the test image
 uploaded_file = st.file_uploader("Upload an image to find similar ones:", type=["jpg", "jpeg", "png"])
 
-# Load the model and features from pickle if available
-model, image_paths, feature_list = load_from_pickle()
+# Load the model from .h5 file
+model = load_model_from_h5()
 
-# Ensure that model and feature list are loaded
-if model is None or image_paths is None or feature_list is None:
-    st.write("Model and features are not loaded. Please train the model first.")
+# Ensure that model is loaded
+if model is None:
+    st.write("Model is not loaded. Please train the model first.")
 else:
     # When an image is uploaded
     if uploaded_file is not None:
         # Save the uploaded image temporarily
         with open("temp_uploaded_image.jpg", "wb") as f:
             f.write(uploaded_file.getbuffer())
+
+        # Here you would need to provide image paths and feature list
+        # This assumes you already have your feature list and image paths
+        # You need to load these from wherever they are saved, possibly using gdown if they are stored online
 
         # Find similar images
         closest_indices = find_similar_images(image_paths, feature_list, "temp_uploaded_image.jpg", model, num_similar_images=4)
