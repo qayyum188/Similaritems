@@ -9,32 +9,20 @@ from sklearn.metrics.pairwise import euclidean_distances
 import pickle
 import gdown  # For downloading files from Google Drive
 
-# Google Drive file links (convert to direct download links)
-pickle_file_url = "https://drive.google.com/uc?id=1i2IfrKdXUAs6zi-O62UlugYiXl2pjSDq"
-dataset_zip_url = "https://drive.google.com/uc?id=1y_Y_1_tq-x2hmOJ4q8YZJsmi8RdayWCI"
+# Google Drive file link for the pickle file containing model and features
+pickle_file_url = "https://drive.google.com/uc?id=1i2IfrKdXUAs6zi-O62UlugYiXl2pjSDq"  # Replace with your file ID
 
-
-# Paths to save the files locally
+# Path to save the pickle file locally
 pickle_file_path = "features_and_model.pkl"
-dataset_folder_path = "similarity_dataset"
 
-# Function to download files from Google Drive
+# Function to download the pickle file from Google Drive
 def download_file(url, output_path):
     if not os.path.exists(output_path):  # Avoid downloading repeatedly
         st.write(f"Downloading {output_path}...")
         gdown.download(url, output_path, quiet=False)
 
-# Download necessary files
+# Download the pickle file containing the model and features
 download_file(pickle_file_url, pickle_file_path)
-
-if not os.path.exists(dataset_folder_path):
-    st.write("Downloading and extracting dataset...")
-    dataset_zip_path = "dataset.zip"
-    download_file(dataset_zip_url, dataset_zip_path)
-    import zipfile
-    with zipfile.ZipFile(dataset_zip_path, "r") as zip_ref:
-        zip_ref.extractall(dataset_folder_path)
-    os.remove(dataset_zip_path)  # Clean up zip file
 
 # Function to extract features using ResNet50
 def extract_features(img_path, model):
@@ -66,7 +54,7 @@ def load_from_pickle():
         print("Model and features loaded from pickle file!")
         return model, image_paths, feature_list
     else:
-        print("Pickle file not found. Please train the model first.")
+        print("Pickle file not found. Please ensure the pickle file is accessible.")
         return None, None, None
 
 # Function to calculate the Euclidean distance between the feature of the test image and all images
